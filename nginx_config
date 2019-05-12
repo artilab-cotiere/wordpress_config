@@ -1,0 +1,32 @@
+
+server {
+  listen 443 ssl;
+  auth_basic "Sou des ecoles Montluel";
+  auth_basic_user_file /var/www/soudesecoles/htpasswd;
+
+  server_name soudesecoles.artilab-cotiere.fr;
+
+  ## required by letsencrypt to generate the certificat
+  location /.well-known/acme-challenge {
+    root /etc/letsencrypt/webrootauth;
+    default_type "text/plain";
+  }
+  ##
+
+  location / {
+    proxy_set_header X-Forwarded-Proto https;
+    proxy_pass http://172.19.0.3;
+  }
+
+
+    ssl_certificate /etc/letsencrypt/live/soudesecoles.artilab-cotiere.fr/fullchain.pem; # managed by Certbot
+    ssl_certificate_key /etc/letsencrypt/live/soudesecoles.artilab-cotiere.fr/privkey.pem; # managed by Certbot
+}
+
+server {
+  listen 80;
+  server_name soudesecoles.artilab-cotiere.fr;
+  if ($host = soudesecoles.artilab-cotiere.fr) {
+      return 301 https://$host$request_uri;
+  } # managed by Certbot
+}
