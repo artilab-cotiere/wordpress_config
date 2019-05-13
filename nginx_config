@@ -6,6 +6,8 @@ server {
 
   server_name soudesecoles.artilab-cotiere.fr;
 
+  client_max_body_size 4G;
+
   ## required by letsencrypt to generate the certificat
   location /.well-known/acme-challenge {
     root /etc/letsencrypt/webrootauth;
