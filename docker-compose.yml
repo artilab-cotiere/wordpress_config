@@ -16,6 +16,8 @@ services:
      depends_on:
        - db
      image: wordpress:latest
+     volumes:
+       - html:/var/www/html
      restart: always
      environment:
        WORDPRESS_DB_HOST: db:3306
@@ -23,13 +25,14 @@ services:
        WORDPRESS_DB_PASSWORD: wordpress
        WORDPRESS_DB_NAME: wordpress
        WORDPRESS_CONFIG_EXTRA: |
-          define( 'WP_HOME', 'https://soudesecoles.artilab-cotiere.fr' );
-          define( 'WP_SITEURL', 'https://soudesecoles.artilab-cotiere.fr' );
+          define( 'WP_HOME', 'https://soumontluel.fr' );
+          define( 'WP_SITEURL', 'https://soumontluel.fr' );
      networks:
        default:
          ipv4_address: 172.19.0.3
 volumes:
     db_data: {}
+    html: {}
 networks:
   default:
     driver: bridge
