@@ -1,12 +1,25 @@
+proxy_cache_path /var/cache/soumontluel levels=1:2 keys_zone=sou_cache:10m max_size=10g 
+                 inactive=60m use_temp_path=off;
+
+log_format upstream_time '$remote_addr - $remote_user [$time_local] '
+	'"$request" $status $body_bytes_sent '
+	'"$http_referer" "$http_user_agent"'
+	'rt=$request_time uct="$upstream_connect_time" uht="$upstream_header_time" urt="$upstream_response_time"';
+
+upstream backend {
+  server 172.19.0.3;
+}
 
 server {
   listen 443 ssl;
-  auth_basic "Sou des ecoles Montluel";
-  auth_basic_user_file /var/www/soudesecoles/htpasswd;
+  #auth_basic "Sou des ecoles Montluel";
+  #auth_basic_user_file /var/www/soudesecoles/htpasswd;
 
-  server_name soudesecoles.artilab-cotiere.fr;
+  server_name soumontluel.fr
 
   client_max_body_size 4G;
+
+  access_log /var/log/sou-nginx-access.log upstream_time;
 
   ## required by letsencrypt to generate the certificat
   location /.well-known/acme-challenge {
@@ -17,18 +30,24 @@ server {
 
   location / {
     proxy_set_header X-Forwarded-Proto https;
-    proxy_pass http://172.19.0.3;
+    proxy_pass http://backend;
   }
 
+  location ~* \.(js|css|png|jpg|jpeg|gif|ico)$ {
+    expires 1d;
+    proxy_set_header X-Forwarded-Proto https;
+    proxy_cache sou_cache;
+    proxy_pass http://backend;
+  }
 
-    ssl_certificate /etc/letsencrypt/live/soudesecoles.artilab-cotiere.fr/fullchain.pem; # managed by Certbot
-    ssl_certificate_key /etc/letsencrypt/live/soudesecoles.artilab-cotiere.fr/privkey.pem; # managed by Certbot
+    ssl_certificate /etc/letsencrypt/live/soumontluel.fr/fullchain.pem; # managed by Certbot
+    ssl_certificate_key /etc/letsencrypt/live/soumontluel.fr/privkey.pem; # managed by Certbot
 }
 
 server {
   listen 80;
-  server_name soudesecoles.artilab-cotiere.fr;
-  if ($host = soudesecoles.artilab-cotiere.fr) {
+  server_name soumontluel.fr;
+  if ($host = soumontluel.fr) {
       return 301 https://$host$request_uri;
   } # managed by Certbot
 }
