@@ -30,6 +30,7 @@ server {
 
   location / {
     proxy_set_header X-Forwarded-Proto https;
+    proxy_set_header Host soumontluel.fr;
     proxy_pass http://backend;
   }
 
@@ -50,4 +51,12 @@ server {
   if ($host = soumontluel.fr) {
       return 301 https://$host$request_uri;
   } # managed by Certbot
+}
+
+# www -> non-www
+server {
+    listen 443 ssl;
+    listen 80;
+    server_name www.soumontluel.fr;
+    return 301 $scheme://soumontluel.fr$request_uri;
 }
